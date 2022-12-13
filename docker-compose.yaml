@@ -19,3 +19,8 @@ services:
       - .dbdata:/var/lib/postgresql/data
     ports:
       - 54322:${DB_PORT}
+  redis:
+    image: redis
+    ports:
+      - ${REDIS_PORT}:${REDIS_PORT}
+    command: --requirepass ${REDIS_PASSWORD}

@@ -1,4 +1,10 @@
-import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  PrimaryColumn,
+} from 'typeorm';
 
 export enum UserRole {
   USER = 'USER',
@@ -7,9 +13,6 @@ export enum UserRole {
 
 @Entity()
 export class User {
-  @PrimaryGeneratedColumn()
-  no: number;
-
   @PrimaryColumn({ unique: true })
   id: string;
 
@@ -22,9 +25,6 @@ export class User {
   @Column({ nullable: true })
   avatar: string;
 
-  @Column()
-  nickname: string;
-
   @Column({
     type: 'enum',
     enum: UserRole,
@@ -32,4 +32,10 @@ export class User {
     default: [],
   })
   roles: UserRole[];
+
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
+
+  @DeleteDateColumn({ name: 'deleted_at' })
+  deletedAt: Date | null;
 }
