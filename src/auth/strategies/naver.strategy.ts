@@ -33,7 +33,6 @@ export class NaverStrategy extends PassportStrategy(Strategy, 'naver') {
       createdAt: new Date(),
       deletedAt: null,
     };
-    console.log(user);
     return this.authService.validate(user);
   }
 }

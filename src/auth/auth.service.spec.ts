@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { User } from '../entities';
+import { userStub } from '../user/user.mock';
 import { UserService } from '../user/user.service';
 import { AuthService } from './auth.service';
 
@@ -11,13 +12,8 @@ describe('AuthService', () => {
     fakeUserService = {
       findOneById: (id: string) => {
         return Promise.resolve({
+          ...userStub(),
           id,
-          email: 'test@test.com',
-          username: 'test_username',
-          avatar: 'http://test.com/test.jpg',
-          roles: [],
-          createdAt: new Date('2022-12-10'),
-          deletedAt: null,
         });
       },
       create: (user: User) => {
@@ -38,8 +34,20 @@ describe('AuthService', () => {
     expect(service).toBeDefined();
   });
 
-  it('validate create new user and return created user if user is not found', () => {
-    fakeUserService.findOneById = () => null;
-    expect(fakeUserService.create).toHaveBeenCalledTimes(0);
+  describe('When validate is called', () => {
+    it('should create new user and return created user if user is not found', async () => {
+      fakeUserService.findOneById = () => null;
+      const userServiceCreateFn = jest.spyOn(fakeUserService, 'create');
+      const res = await service.validate(userStub());
+      expect(userServiceCreateFn).toHaveBeenCalledTimes(1);
+      expect(res).toEqual(userStub());
+    });
+
+    it('should return found user if user is found', async () => {
+      const userServiceCreateFn = jest.spyOn(fakeUserService, 'create');
+      const res = await service.validate(userStub());
+      expect(userServiceCreateFn).toHaveBeenCalledTimes(0);
+      expect(res).toEqual(userStub());
+    });
   });
 });
