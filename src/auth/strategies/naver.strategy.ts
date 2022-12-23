@@ -3,6 +3,7 @@ import { Strategy, Profile } from 'passport-naver';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AuthService } from '../auth.service';
+import { UserRole } from '../../entities/user.entity';
 
 @Injectable()
 export class NaverStrategy extends PassportStrategy(Strategy, 'naver') {
@@ -29,9 +30,6 @@ export class NaverStrategy extends PassportStrategy(Strategy, 'naver') {
       email: emails[0].value,
       username: displayName,
       avatar: _json.profile_image,
-      roles: [],
-      createdAt: new Date(),
-      deletedAt: null,
     };
     return this.authService.validate(user);
   }

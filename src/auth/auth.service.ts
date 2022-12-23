@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { DeepPartial } from 'typeorm';
 import { User } from '../entities';
 import { UserService } from '../user/user.service';
 
@@ -8,7 +9,7 @@ export class AuthService {
     private readonly userService: UserService
   ) {}
 
-  async validate(user: User) {
+  async validate(user: DeepPartial<User>) {
     const { id } = user;
     const foundUser = await this.userService.findOneById(id);
     if (!foundUser) {

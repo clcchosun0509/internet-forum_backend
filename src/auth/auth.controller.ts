@@ -1,6 +1,16 @@
-import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpStatus,
+  Next,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
+import { User } from '../entities';
 import { AuthGuard } from './guards/auth.guard';
 
 import { NaverOAuthGuard } from './guards/naver-oauth.guard';
@@ -16,8 +26,18 @@ export class AuthController {
 
   @Get('naver/callback')
   @UseGuards(NaverOAuthGuard)
-  naverRedirect(@Res() res: Response) {
+  naverRedirect(@Req() req: Request, @Res() res: Response) {
+    const user = req.user as User | null;
     res.cookie('logged_in', true, {
+      httpOnly: false,
+    });
+    res.cookie('email', user?.email, {
+      httpOnly: false,
+    });
+    res.cookie('username', user?.username, {
+      httpOnly: false,
+    });
+    res.cookie('avatar', user?.avatar, {
       httpOnly: false,
     });
     res.redirect(this.CLIENT_URL);
@@ -27,5 +47,20 @@ export class AuthController {
   @UseGuards(AuthGuard)
   status(@Req() req: Request) {
     return req.user;
+  }
+
+  @Post('logout')
+  @UseGuards(AuthGuard)
+  logout(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Next() next: NextFunction,
+  ) {
+    req.logout(function (err) {
+      if (err) {
+        return next(err);
+      }
+      return res.status(HttpStatus.OK).json({ status: 'success' });
+    });
   }
 }

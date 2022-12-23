@@ -8,6 +8,7 @@ services:
       - .:/app
     depends_on:
       - db
+      - redis
   db:
     image: postgres:15.1
     restart: always

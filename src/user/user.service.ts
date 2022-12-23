@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DeepPartial, Repository } from 'typeorm';
 import { User } from '../entities';
 
 @Injectable()
@@ -9,7 +9,7 @@ export class UserService {
     @InjectRepository(User) private readonly repo: Repository<User>,
   ) {}
 
-  create(user: User) {
+  create(user: DeepPartial<User>) {
     const createdUser = this.repo.create(user);
     return this.repo.save(createdUser);
   }

@@ -11,6 +11,8 @@ export enum UserRole {
   ADMIN = 'ADMIN',
 }
 
+export const UserRoles = [UserRole.USER, UserRole.ADMIN];
+
 @Entity()
 export class User {
   @PrimaryColumn({ unique: true })
@@ -29,7 +31,7 @@ export class User {
     type: 'enum',
     enum: UserRole,
     array: true,
-    default: [],
+    default: [UserRole.USER],
   })
   roles: UserRole[];
 
