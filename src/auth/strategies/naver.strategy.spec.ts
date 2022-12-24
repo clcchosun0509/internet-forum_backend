@@ -46,8 +46,6 @@ describe('NaverStrategy', () => {
 
   describe('When validate is called', () => {
     it('should returns user entity', async () => {
-      const fakeTime = new Date('2022-12-10');
-      jest.useFakeTimers().setSystemTime(fakeTime);
       const user = await naverStrategy.validate('', '', profile);
 
       expect(user).toEqual({
@@ -55,9 +53,6 @@ describe('NaverStrategy', () => {
         email: profile.emails[0].value,
         username: profile.displayName,
         avatar: profile._json.profile_image,
-        roles: [],
-        createdAt: fakeTime,
-        deletedAt: null,
       });
 
       jest.useRealTimers();

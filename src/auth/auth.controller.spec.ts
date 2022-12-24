@@ -38,14 +38,22 @@ describe('AuthController', () => {
   });
 
   describe('When naverRedirect is called', () => {
-    it('should add logged_in cookie and redirect to client url', async () => {
+    it('should send user information cookies and redirect to client url', async () => {
+      const userMock = userStub();
+      const requestMock = httpMocks.createRequest({ user: userMock });
       const responseMock = httpMocks.createResponse();
+      
       jest.spyOn(responseMock, 'redirect');
-      controller.naverRedirect(responseMock);
+      controller.naverRedirect(requestMock, responseMock);
 
-      expect(responseMock.cookies.logged_in).toEqual({
-        value: true,
-        options: { httpOnly: false },
+      expect(responseMock.cookies).toEqual({
+        logged_in: { value: true, options: { httpOnly: false } },
+        email: { value: userMock.email, options: { httpOnly: false } },
+        username: { value: userMock.username, options: { httpOnly: false } },
+        avatar: {
+          value: userMock.avatar,
+          options: { httpOnly: false },
+        },
       });
       expect(responseMock.statusCode).toEqual(302);
       expect(responseMock.redirect).toHaveBeenCalledWith(fakeClientURL);
