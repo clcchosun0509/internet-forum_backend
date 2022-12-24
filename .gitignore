@@ -40,3 +40,4 @@ lerna-debug.log*
 # ENVs
 .env.development
 .env.test
+.env.production

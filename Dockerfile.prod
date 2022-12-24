@@ -1,0 +1,16 @@
+FROM node:17.8 as base
+
+WORKDIR /app
+COPY package.json .
+COPY package-lock.json package-lock.json
+
+RUN npm ci
+COPY . .
+
+# Test
+FROM base as test
+RUN npm run test
+
+# BUILD
+FROM base as build
+RUN npm run build
