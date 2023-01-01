@@ -7,7 +7,9 @@ export const userStub = () => {
     username: 'test_username',
     avatar: 'http://test.com/test.jpg',
     roles: [UserRole.USER],
+    posts: [],
     createdAt: new Date('2022-12-10'),
+    updatedAt: new Date('2022-12-10'),
     deletedAt: null,
   };
 };

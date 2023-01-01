@@ -3,8 +3,12 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
+  OneToMany,
   PrimaryColumn,
+  UpdateDateColumn,
 } from 'typeorm';
+import { Post } from './post.entity';
 
 export enum UserRole {
   USER = 'USER',
@@ -35,8 +39,14 @@ export class User {
   })
   roles: UserRole[];
 
+  @OneToMany(() => Post, (post) => post.author)
+  posts: Post[];
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
+
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
 
   @DeleteDateColumn({ name: 'deleted_at' })
   deletedAt: Date | null;

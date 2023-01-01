@@ -60,6 +60,10 @@ export class AuthController {
       if (err) {
         return next(err);
       }
+      res.clearCookie('logged_in');
+      res.clearCookie('email');
+      res.clearCookie('username');
+      res.clearCookie('avatar');
       return res.status(HttpStatus.OK).json({ status: 'success' });
     });
   }
