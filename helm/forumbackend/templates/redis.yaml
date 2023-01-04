@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: forumredis
+spec:
+  selector:
+    matchLabels:
+      app: forumredis
+  template:
+    metadata:
+      labels:
+        app: forumredis
+    spec:
+      containers:
+        - name: forumredis
+          image: redis:latest
+          imagePullPolicy: Always
+          env:
+            - name: REDIS_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: redis
+                  key: REDIS_PASS
+          args: ["--requirepass", "$(REDIS_PASS)"]
+          ports:
+            - containerPort: 6379
+          volumeMounts:
+            - mountPath: /data
+              name: redisdata
+      volumes:
+        - name: redisdata
+          hostPath:
+            path: /home/redisdata
+            type: DirectoryOrCreate
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: forumredis
+spec:
+  type: ClusterIP
+  ports:
+    - port: 6379
+      targetPort: 6379
+      protocol: TCP
+  selector:
+    app: forumredis

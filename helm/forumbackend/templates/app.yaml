@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: forumbackend
+  labels:
+    app: forumbackend
+spec:
+  selector:
+    matchLabels:
+      app: forumbackend
+  template:
+    metadata:
+      labels:
+        app: forumbackend
+    spec:
+      containers:
+        - image: {{ .Values.appimage }}
+          name: forumbackend
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          env:
+            - name: NODE_ENV
+              value: 'production'
+            - name: DB_HOST
+              value: 'forumdb'
+            - name: DB_PORT
+              value: '5432'
+            - name: DB_USERNAME
+              value: 'postgres'
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres
+                  key: DB_PASS
+                  optional: false
+            - name: DB_NAME
+              value: 'production'
+            - name: REDIS_HOST
+              value: 'forumredis'
+            - name: REDIS_PORT
+              value: '6379'
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis
+                  key: REDIS_PASS
+                  optional: false
+            - name: SESSION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: redis
+                  key: REDIS_SESSION_PASS
+                  optional: false
+            - name: NAVER_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: oauth
+                  key: NAVER_CLIENT_ID
+                  optional: false
+            - name: NAVER_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: oauth
+                  key: NAVER_CLIENT_SECRET
+                  optional: false
+            - name: NAVER_REDIRECT_URL
+              value: 'https://hahahaforum.com/api/auth/naver/callback'
+            - name: CLIENT_URL
+              value: 'https://hahahaforum.com'
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: forumbackend-svc
+spec:
+  type: NodePort
+  selector:
+    app: forumbackend
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 3000
