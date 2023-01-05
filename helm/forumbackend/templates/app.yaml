@@ -67,7 +67,25 @@ spec:
             - name: NAVER_REDIRECT_URL
               value: 'https://hahahaforum.com/api/auth/naver/callback'
             - name: CLIENT_URL
-              value: 'https://hahahaforum.com'
+              value: 'http://hahahaforum.com'
+            - name: IMAGEKIT_PUBLIC_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: imagekit
+                  key: IMAGEKIT_PUBLIC_API_KEY
+                  optional: false
+            - name: IMAGEKIT_PRIVATE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: imagekit
+                  key: IMAGEKIT_PRIVATE_API_KEY
+                  optional: false
+            - name: IMAGEKIT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: imagekit
+                  key: IMAGEKIT_ID
+                  optional: false
 
 ---
 
