@@ -19,6 +19,6 @@ export class BoardController {
     @Param('id', ParseBoardIdPipe) id: BoardId,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
   ) {
-    return this.postService.getPostsByBoardId(page, 30, id);
+    return this.postService.getPostsByBoardId(page, 20, id);
   }
 }

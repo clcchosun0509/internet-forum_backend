@@ -39,9 +39,9 @@ describe('BoardController', () => {
     const result = await controller.getPosts(id, page);
     expect(fakePostService.getPostsByBoardId).toHaveBeenCalledWith(
       page,
-      30,
+      20,
       id,
     );
-    expect(result).toEqual(postsStub(30, id));
+    expect(result).toEqual(postsStub(20, id));
   });
 });
