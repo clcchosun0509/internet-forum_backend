@@ -6,6 +6,7 @@ import { Post, User } from '../entities';
 import { BoardId } from '../entities/board-id.type';
 import { CreatePostDto } from './dtos/create-post.dto';
 import { UpdatePostDto } from './dtos/update-post.dto';
+import { checkIsValidAndAuthorized } from './utils/service-helper';
 
 @Injectable()
 export class PostService {
@@ -29,11 +30,20 @@ export class PostService {
     return true;
   }
 
-  async updatePost(id: number, updatePostDto: UpdatePostDto) {
+  async updatePost(id: number, user: User, updatePostDto: UpdatePostDto) {
+    const foundPost = await this.findOneById(id);
+    checkIsValidAndAuthorized(foundPost, user);
+
     const { title, content } = updatePostDto;
-    const post: Post = (await this.repo.update({ id }, { title, content }))
-      .raw?.[0];
-    return post;
+    await this.repo.update({ id }, { title, content });
+    return await this.findOneById(id);
+  }
+
+  async deletePost(id: number, user: User) {
+    const foundPost = await this.findOneById(id);
+    checkIsValidAndAuthorized(foundPost, user);
+
+    return await this.repo.softDelete({ id });
   }
 
   getPostsByBoardId(page: number, limit: number, boardId: BoardId) {

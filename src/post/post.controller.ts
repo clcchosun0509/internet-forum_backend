@@ -1,12 +1,12 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
   Patch,
   Post,
-  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { AuthUser } from '../auth/decorators/auth-user.decorator';
@@ -44,13 +44,17 @@ export class PostController {
     @AuthUser() user: User,
     @Body() body: UpdatePostDto,
   ) {
-    const foundPost = await this.postService.findOneById(id);
-    
-    const isAdmin = user.roles.includes(UserRole.ADMIN);
-    if (!isAdmin && user.id !== foundPost.authorId) {
-      throw new UnauthorizedException('게시글 작성자가 아닙니다.');
-    }
+    return await this.postService.updatePost(id, user, body);
+  }
 
-    return await this.postService.updatePost(id, body);
+  @Delete('/:id')
+  @UseGuards(AuthGuard)
+  @Role(UserRole.USER)
+  async deletePost(
+    @Param('id', ParseIntPipe) id: number,
+    @AuthUser() user: User,
+  ) {
+    await this.postService.deletePost(id, user);
+    return true;
   }
 }
