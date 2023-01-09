@@ -3,11 +3,11 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  JoinColumn,
   OneToMany,
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { PostLike } from './post-like.entity';
 import { Post } from './post.entity';
 
 export enum UserRole {
@@ -41,6 +41,9 @@ export class User {
 
   @OneToMany(() => Post, (post) => post.author)
   posts: Post[];
+
+  @OneToMany(() => PostLike, (postLike) => postLike.user)
+  postLikes: PostLike[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

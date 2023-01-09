@@ -55,6 +55,6 @@ export class PostController {
     @AuthUser() user: User,
   ) {
     await this.postService.deletePost(id, user);
-    return true;
+    return { status: true };
   }
 }

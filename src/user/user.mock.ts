@@ -1,13 +1,14 @@
-import { UserRole } from "../entities/user.entity";
+import { User, UserRole } from "../entities/user.entity";
 
-export const userStub = () => {
+export const userStub = (id?: string): User => {
   return {
-    id: 'test',
+    id: id ? id : 'test',
     email: 'test@test.com',
     username: 'test_username',
     avatar: 'http://test.com/test.jpg',
     roles: [UserRole.USER],
     posts: [],
+    postLikes: [],
     createdAt: new Date('2022-12-10'),
     updatedAt: new Date('2022-12-10'),
     deletedAt: null,

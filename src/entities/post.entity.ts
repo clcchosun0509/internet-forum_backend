@@ -5,10 +5,12 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { BoardId } from './board-id.type';
+import { PostLike } from './post-like.entity';
 import { User } from './user.entity';
 import { BoardIdColumn } from './utils/board-id-column.decorator';
 
@@ -35,6 +37,12 @@ export class Post {
 
   @Column('int', { name: 'view_count' })
   viewCount = 0;
+
+  @Column('int', { name: 'like_count' })
+  likeCount = 0;
+
+  @OneToMany(() => PostLike, (postLike) => postLike.post)
+  likes: PostLike[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
