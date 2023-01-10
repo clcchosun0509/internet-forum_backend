@@ -29,6 +29,7 @@ export const postStub = (postId: number, boardId: BoardId): Post => {
     viewCount: 0,
     likeCount: 0,
     likes: [],
+    comments: [],
     createdAt: new Date('2023-01-01'),
     updatedAt: new Date('2023-01-01'),
     deletedAt: null,

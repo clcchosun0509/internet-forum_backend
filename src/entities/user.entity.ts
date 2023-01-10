@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { PostLike } from './post-like.entity';
 import { Post } from './post.entity';
+import { Comment } from './comment.entity';
 
 export enum UserRole {
   USER = 'USER',
@@ -44,6 +45,9 @@ export class User {
 
   @OneToMany(() => PostLike, (postLike) => postLike.user)
   postLikes: PostLike[];
+
+  @OneToMany(() => Comment, (comment) => comment.author)
+  comments: Comment[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

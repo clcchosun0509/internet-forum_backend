@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { PostModule } from './post/post.module';
 import { BoardModule } from './board/board.module';
 import { ImageModule } from './image/image.module';
+import { CommentModule } from './comment/comment.module';
 import * as entities from './entities'
 
 @Module({
@@ -37,6 +38,7 @@ import * as entities from './entities'
     PostModule,
     BoardModule,
     ImageModule,
+    CommentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

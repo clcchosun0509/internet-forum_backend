@@ -9,6 +9,7 @@ export const userStub = (id?: string): User => {
     roles: [UserRole.USER],
     posts: [],
     postLikes: [],
+    comments: [],
     createdAt: new Date('2022-12-10'),
     updatedAt: new Date('2022-12-10'),
     deletedAt: null,

@@ -12,6 +12,7 @@ import {
 import { BoardId } from './board-id.type';
 import { PostLike } from './post-like.entity';
 import { User } from './user.entity';
+import { Comment } from './comment.entity';
 import { BoardIdColumn } from './utils/board-id-column.decorator';
 
 @Entity()
@@ -43,6 +44,9 @@ export class Post {
 
   @OneToMany(() => PostLike, (postLike) => postLike.post)
   likes: PostLike[];
+
+  @OneToMany(() => Comment, (comment) => comment.post)
+  comments: Comment[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
