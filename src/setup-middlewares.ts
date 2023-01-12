@@ -1,4 +1,4 @@
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as session from 'express-session';
 import * as createRedisStore from 'connect-redis';
@@ -30,6 +30,7 @@ export default async (app: INestApplication) => {
   );
   app.use(passport.initialize());
   app.use(passport.session());
+  app.useGlobalPipes(new ValidationPipe());
   app.enableCors({
     origin: ["http://localhost:3020"],
     credentials: true,

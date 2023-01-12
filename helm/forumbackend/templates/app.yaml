@@ -66,6 +66,20 @@ spec:
                   optional: false
             - name: NAVER_REDIRECT_URL
               value: 'https://hahahaforum.com/api/auth/naver/callback'
+            - name: GITHUB_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: oauth
+                  key: GITHUB_CLIENT_ID
+                  optional: false
+            - name: GITHUB_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: oauth
+                  key: GITHUB_CLIENT_SECRET
+                  optional: false
+            - name: GITHUB_REDIRECT_URL
+              value: 'https://hahahaforum.com/api/auth/github/callback'
             - name: CLIENT_URL
               value: 'https://hahahaforum.com'
             - name: IMAGEKIT_PUBLIC_API_KEY

@@ -37,9 +37,6 @@ export class Comment {
   @JoinColumn({ name: 'author_id', referencedColumnName: 'id' })
   author: User;
 
-  @Column({ name: 'parent_comment_username', nullable: true })
-  parentCommentUsername: string | null;
-
   @Column({ name: 'parent_comment_id', nullable: true })
   parentCommentId: string | null;
 

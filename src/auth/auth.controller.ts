@@ -12,6 +12,7 @@ import { ConfigService } from '@nestjs/config';
 import { NextFunction, Request, Response } from 'express';
 import { User } from '../entities';
 import { AuthGuard } from './guards/auth.guard';
+import { GithubOAuthGuard } from './guards/github-oauth.guard';
 
 import { NaverOAuthGuard } from './guards/naver-oauth.guard';
 
@@ -28,19 +29,18 @@ export class AuthController {
   @UseGuards(NaverOAuthGuard)
   naverRedirect(@Req() req: Request, @Res() res: Response) {
     const user = req.user as User | null;
-    res.cookie('logged_in', true, {
-      httpOnly: false,
-    });
-    res.cookie('email', user?.email, {
-      httpOnly: false,
-    });
-    res.cookie('username', user?.username, {
-      httpOnly: false,
-    });
-    res.cookie('avatar', user?.avatar, {
-      httpOnly: false,
-    });
-    res.redirect(this.CLIENT_URL);
+    this.setCookiesAndRedirect(user, res);
+  }
+
+  @Get('github')
+  @UseGuards(GithubOAuthGuard)
+  githubLogin() {}
+
+  @Get('github/callback')
+  @UseGuards(GithubOAuthGuard)
+  githubRedirect(@Req() req: Request, @Res() res: Response) {
+    const user = req.user as User | null;
+    this.setCookiesAndRedirect(user, res);
   }
 
   @Get('status')
@@ -67,4 +67,20 @@ export class AuthController {
       return res.status(HttpStatus.OK).json({ status: 'success' });
     });
   }
+
+  protected setCookiesAndRedirect = (user: User, res: Response) => {
+    res.cookie('logged_in', true, {
+      httpOnly: false,
+    });
+    res.cookie('email', user?.email, {
+      httpOnly: false,
+    });
+    res.cookie('username', user?.username, {
+      httpOnly: false,
+    });
+    res.cookie('avatar', user?.avatar, {
+      httpOnly: false,
+    });
+    res.redirect(this.CLIENT_URL);
+  };
 }

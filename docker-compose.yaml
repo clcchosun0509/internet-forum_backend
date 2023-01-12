@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: ./Dockerfile.local
     ports:
-      - 8000:3000
+      - 8111:3000
     volumes:
       - .:/app
     depends_on:

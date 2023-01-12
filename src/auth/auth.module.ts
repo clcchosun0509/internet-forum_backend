@@ -4,10 +4,11 @@ import { AuthController } from './auth.controller';
 import { NaverStrategy } from './strategies/naver.strategy';
 import { SessionSerializer } from './session.serializer';
 import { UserModule } from '../user/user.module';
+import { GithubStrategy } from './strategies/github.strategy';
 
 @Module({
   imports: [UserModule],
-  providers: [NaverStrategy, SessionSerializer, AuthService],
+  providers: [NaverStrategy, GithubStrategy, SessionSerializer, AuthService],
   controllers: [AuthController],
 })
 export class AuthModule {}

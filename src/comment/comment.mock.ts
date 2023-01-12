@@ -12,7 +12,6 @@ export const commentStub = (commentId: string, postId: number): Comment => {
     post: postStub(postId, BoardId.Free),
     authorId: `author ${postId}`,
     author: userStub(`author ${postId}`),
-    parentCommentUsername: null,
     parentCommentId: null,
     parentComment: null,
     childComments: null,

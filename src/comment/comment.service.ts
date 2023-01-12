@@ -20,6 +20,8 @@ export class CommentService {
       .createQueryBuilder('comment')
       .where('comment.post_id = :postId', { postId })
       .leftJoinAndSelect('comment.author', 'author')
+      .leftJoinAndSelect('comment.parentComment', 'parentComment')
+      .leftJoinAndSelect('parentComment.author', 'parentCommentAuthor')
       .getMany();
       
     const sortedComments: Comment[] = [];
@@ -83,7 +85,6 @@ export class CommentService {
       postId: parentComment.postId,
       authorId: author.id,
       parentComment: { id: parentComment.id },
-      parentCommentUsername: parentComment.author.username,
     });
 
     return await this.commentRepo.save(comment);
