@@ -1,0 +1,44 @@
+{
+  "settings": {
+    "refresh_interval": "1s",
+    "analysis": {
+      "analyzer": {
+        "post_content_analyzer": {
+          "type": "custom",
+          "char_filter": [
+            "html_strip"
+          ],
+          "tokenizer": "nori_mixed",
+          "filter": [
+            "lowercase",
+            "unique"
+          ]
+        }
+      },
+      "tokenizer": {
+        "nori_mixed": {
+          "type": "nori_tokenizer",
+          "decompound_mode": "mixed"
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "title": {
+        "type": "text",
+        "analyzer": "post_content_analyzer"
+      },
+      "board_id": {
+        "type": "keyword"
+      },
+      "content": {
+        "type": "text",
+        "analyzer": "post_content_analyzer"
+      },
+      "created_at": {
+        "type": "date"
+      }
+    }
+  }
+}

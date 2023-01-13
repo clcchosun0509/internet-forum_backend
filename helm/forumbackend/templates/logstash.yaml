@@ -1,0 +1,161 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: logstash-start
+data:
+  start.sh: |
+    #!/bin/bash
+    curl -L -O https://jdbc.postgresql.org/download/postgresql-42.5.1.jar
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: logstash-pipelines-yml
+data:
+  pipelines.yml: |
+    - pipeline.id: "pg-post"
+      path.config: "/usr/share/logstash/pipeline/pg-post.conf"
+    - pipeline.id: "pg-user"
+      path.config: "/usr/share/logstash/pipeline/pg-user.conf"
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: logstash-pipeline-confs
+data:
+  pg-post.conf: |
+    input {
+      jdbc {
+        jdbc_driver_library => "/usr/share/logstash/postgresql-42.5.1.jar"
+        jdbc_driver_class => "org.postgresql.Driver"
+        jdbc_connection_string => "jdbc:postgresql://forumdb:5432/production"
+        jdbc_user => "postgres"
+        jdbc_password => "${DB_PASSWORD}"
+        jdbc_paging_enabled => true
+        tracking_column => "unix_ts_in_secs"
+        use_column_value => true
+        tracking_column_type => "numeric"
+        schedule => "*/5 * * * * *"
+        statement => "SELECT id, title, author_id, content, board_id, view_count, like_count, created_at, deleted_at, Extract(epoch FROM updated_at) AS unix_ts_in_secs FROM post WHERE ( Extract(epoch FROM updated_at) > :sql_last_value AND updated_at < Now() at time zone 'utc' ) ORDER BY updated_at ASC"
+      }
+    }
+    filter {
+      mutate {
+        copy => {
+          "id" => "[@metadata][_id]"
+        }
+        remove_field => ["@version", "unix_ts_in_secs"]
+      }
+    }
+    output {
+      elasticsearch {
+        hosts => "http://elasticsearch:9200"
+        index => "hahaha-post"
+        document_id => "%{[@metadata][_id]}"
+      }
+    }
+  pg-user.conf: |
+    input {
+      jdbc {
+        jdbc_driver_library => "/usr/share/logstash/postgresql-42.5.1.jar"
+        jdbc_driver_class => "org.postgresql.Driver"
+        jdbc_connection_string => "jdbc:postgresql://forumdb:5432/production"
+        jdbc_user => "postgres"
+        jdbc_password => "${DB_PASSWORD}"
+        jdbc_paging_enabled => true
+        tracking_column => "unix_ts_in_secs"
+        use_column_value => true
+        tracking_column_type => "numeric"
+        schedule => "*/5 * * * * *"
+        statement => "SELECT id, email, username, avatar, roles, created_at, deleted_at, Extract(epoch FROM updated_at) AS unix_ts_in_secs FROM public.user WHERE ( Extract(epoch FROM updated_at) > :sql_last_value AND updated_at < Now() at time zone 'utc' ) ORDER BY updated_at ASC"
+      }
+    }
+    filter {
+      mutate {
+        copy => {
+          "id" => "[@metadata][_id]"
+        }
+        remove_field => ["@version", "unix_ts_in_secs"]
+      }
+    }
+    output {
+      elasticsearch {
+        hosts => "http://elasticsearch:9200"
+        index => "hahaha-user"
+        document_id => "%{[@metadata][_id]}"
+      }
+    }
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: logstash
+  name: logstash
+spec:
+  selector:
+    matchLabels:
+      app: logstash
+  template:
+    metadata:
+      labels:
+        app: logstash
+    spec:
+      containers:
+        - image: logstash:8.6.0
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                  - /start/start.sh
+          name: logstash
+          ports:
+            - containerPort: 5044
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres
+                  key: DB_PASS
+                  optional: false
+          volumeMounts:
+            - name: logstash-pipeline-confs
+              mountPath: /usr/share/logstash/pipeline
+              readOnly: true
+            - name: logstash-pipelines-yml
+              mountPath: /usr/share/logstash/config/pipelines.yml
+              subPath: pipelines.yml
+              readOnly: true
+            - name: start
+              mountPath: /start
+              
+      volumes:
+        - name: logstash-pipeline-confs
+          configMap:
+            name: logstash-pipeline-confs
+        - name: logstash-pipelines-yml
+          configMap:
+            name: logstash-pipelines-yml
+        - name: start
+          configMap:
+            name: logstash-start
+            defaultMode: 0777
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: logstash
+spec:
+  type: ClusterIP
+  selector:
+    app: logstash
+  ports:
+    - port: 5044

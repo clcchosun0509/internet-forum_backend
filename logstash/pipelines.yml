@@ -1,0 +1,4 @@
+- pipeline.id: "pg-post"
+  path.config: "/usr/share/logstash/pipeline/pg-post.conf"
+- pipeline.id: "pg-user"
+  path.config: "/usr/share/logstash/pipeline/pg-user.conf"

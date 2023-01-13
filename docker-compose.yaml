@@ -11,6 +11,7 @@ services:
     depends_on:
       - db
       - redis
+      - elasticsearch-mapping-init
   db:
     image: postgres:15.1
     restart: always
@@ -27,3 +28,55 @@ services:
     ports:
       - ${REDIS_PORT}:${REDIS_PORT}
     command: --requirepass ${REDIS_PASSWORD}
+  elasticsearch:
+    build:
+      context: elasticsearch/
+    ports:
+      - 9200:9200
+      - 9300:9300
+    environment:
+      node.name: elasticsearch
+      ES_JAVA_OPTS: -Xms512m -Xmx512m
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      discovery.type: single-node
+      xpack.security.enabled: false
+      
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+  elasticsearch-mapping-init:
+    build: 
+      context: elasticsearch-mapping-init/
+    links:
+      - elasticsearch
+    depends_on:
+      - elasticsearch
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.6.0
+    volumes:
+      - ./logstash/postgresql-42.5.1.jar:/usr/share/logstash/postgresql-42.5.1.jar
+      - ./logstash/pipelines.yml/:/usr/share/logstash/config/pipelines.yml
+      - ./logstash/pipeline/:/usr/share/logstash/pipeline/
+    ports:
+      - "5044:5044"
+    depends_on:
+      - db
+      - elasticsearch
+    links:
+      - db
+      - elasticsearch
+    environment:
+      xpack.monitoring.enabled: true
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.6.0
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch-mapping-init
+    environment:
+      - SERVER_PORT=5601
+      - SERVER_NAME=kibana
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    links:
+      - elasticsearch

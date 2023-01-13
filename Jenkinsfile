@@ -12,8 +12,10 @@ pipeline{
   }
 
   environment {
-    BUILD_IMAGE_TAG = "build-image-tag:latest"
-    TEST_IMAGE_TAG = "test-image-tag:latest"
+    APP_BUILD_IMAGE = "app-build:latest"
+    ES_BUILD_IMAGE = "elasticsearch-build:latest"
+    ES_MAPPING_BUILD_IMAGE = "elasticsearch-mapping-build:latest"
+    APP_TEST_IMAGE = "app-test:latest"
     REGISTRY = "clcchosun0509/forumbackend"
     REGISTRY_CREDENTIAL = 'dockerhub'
     HELM_APP_NAME = 'forumbackend-stack'
@@ -34,8 +36,14 @@ pipeline{
     stage('Build'){
       steps{
         container('docker'){
-          sh "docker build --target build --tag ${env.BUILD_IMAGE_TAG} -f ./Dockerfile.prod ."
-          sh "docker run --rm ${env.BUILD_IMAGE_TAG}"
+          sh "docker build --target build --tag ${env.APP_BUILD_IMAGE} -f ./Dockerfile.prod ."
+          sh "docker build --tag ${env.ES_BUILD_IMAGE} -f ./elasticsearch/Dockerfile ."
+          sh script:"""
+            #!/bin/bash
+            cd ./elasticsearch-mapping-init
+            docker build --tag ${env.ES_MAPPING_BUILD_IMAGE} .
+          """
+          sh "docker run --rm ${env.APP_BUILD_IMAGE}"
         }
       }
     }
@@ -43,8 +51,8 @@ pipeline{
     stage('Test'){
       steps{
         container('docker'){
-          sh "docker build --target test --tag ${env.TEST_IMAGE_TAG} -f ./Dockerfile.prod ."
-          sh "docker run --rm ${env.TEST_IMAGE_TAG}"
+          sh "docker build --target test --tag ${env.APP_TEST_IMAGE} -f ./Dockerfile.prod ."
+          sh "docker run --rm ${env.APP_TEST_IMAGE}"
         }
       }
     }
@@ -67,7 +75,7 @@ pipeline{
         container('helm'){
           sh "helm list"
           sh "helm lint ${env.HELM_CHART_DIRECTORY}"
-          sh "helm upgrade --install --force ${env.HELM_APP_NAME} ${env.HELM_CHART_DIRECTORY} --set appimage=${env.REGISTRY}:${env.BUILD_NUMBER} --namespace prod"
+          sh "helm upgrade --install --force ${env.HELM_APP_NAME} ${env.HELM_CHART_DIRECTORY} --set appimage=${env.REGISTRY}:${env.BUILD_NUMBER} --set esimage=${env.ES_BUILD_IMAGE} --set esmapimage=${env.ES_MAPPING_BUILD_IMAGE} --namespace prod"
         }
       }
     }
@@ -75,8 +83,8 @@ pipeline{
     stage('Clean Docker Images'){
       steps{
         container('docker'){
-          sh "docker rmi ${env.BUILD_IMAGE_TAG}"
-          sh "docker rmi ${env.TEST_IMAGE_TAG}"
+          sh "docker rmi ${env.APP_BUILD_IMAGE}"
+          sh "docker rmi ${env.APP_TEST_IMAGE}"
           sh "docker rmi ${env.REGISTRY}:${env.BUILD_NUMBER}"
         }
       }
