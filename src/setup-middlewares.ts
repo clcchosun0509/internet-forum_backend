@@ -30,9 +30,9 @@ export default async (app: INestApplication) => {
   );
   app.use(passport.initialize());
   app.use(passport.session());
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
   app.enableCors({
-    origin: ["http://localhost:3020"],
+    origin: ['http://localhost:3020'],
     credentials: true,
   });
 };

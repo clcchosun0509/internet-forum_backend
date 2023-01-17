@@ -1,7 +1,11 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { paginate } from 'nestjs-typeorm-paginate';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, In, Repository } from 'typeorm';
 import { Post, PostLike, User } from '../entities';
 import { BoardId } from '../entities/board-id.type';
 import { CreatePostDto } from './dtos/create-post.dto';
@@ -62,6 +66,14 @@ export class PostService {
         order: { createdAt: 'DESC' },
       },
     );
+  }
+
+  getPostsByPostIds(postIds: number[]) {
+    return this.postRepo.find({
+      where: { id: In(postIds) },
+      relations: ['author'],
+      order: { createdAt: 'DESC' },
+    });
   }
 
   async likePost(id: number, user: User) {
