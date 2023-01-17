@@ -7,7 +7,7 @@ import { postLikeStub, postStub } from './post.mock';
 import { PostService } from './post.service';
 import { paginate } from 'nestjs-typeorm-paginate';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
-import { DataSource, QueryRunner } from 'typeorm';
+import { DataSource, FindOperator } from 'typeorm';
 
 jest.mock('nestjs-typeorm-paginate', () => ({
   paginate: jest.fn(),
@@ -16,6 +16,7 @@ jest.mock('nestjs-typeorm-paginate', () => ({
 describe('PostService', () => {
   let service: PostService;
   const postId = 1;
+  const postIds = [1, 2, 3];
   const boardId = BoardId.Free;
   const userId = 'test';
   const postMock = postStub(postId, boardId);
@@ -33,6 +34,13 @@ describe('PostService', () => {
       },
     ),
     increment: jest.fn().mockResolvedValue({}),
+    find: jest.fn((query: {
+      where: { id: FindOperator<number[]> },
+      relations: string[],
+      order: { createdAt: string },
+    }) => {
+      return Promise.resolve(query.where.id.value.map((id) => postStub(id, boardId)))
+    })
   };
 
   const postLikeRepositoryMock = {
@@ -135,6 +143,13 @@ describe('PostService', () => {
         expect.objectContaining({}),
       );
     });
+  });
+
+  describe('When getPostsByPostIds is called', () => {
+    it('should return posts', async () => {
+      const res = await service.getPostsByPostIds(postIds);
+      expect(res).toEqual([postStub(postIds[0], boardId), postStub(postIds[1], boardId), postStub(postIds[2], boardId)])
+    })
   });
 
   describe('When likePost is called', () => {

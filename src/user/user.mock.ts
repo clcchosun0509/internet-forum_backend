@@ -1,10 +1,10 @@
 import { User, UserRole } from "../entities/user.entity";
 
-export const userStub = (id?: string): User => {
+export const userStub = (id?: string, username?: string): User => {
   return {
     id: id ? id : 'test',
     email: 'test@test.com',
-    username: 'test_username',
+    username: username ? username : 'test_username',
     avatar: 'http://test.com/test.jpg',
     roles: [UserRole.USER],
     posts: [],

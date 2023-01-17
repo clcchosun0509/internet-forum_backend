@@ -4,7 +4,7 @@ import { BoardId } from '../entities/board-id.type';
 import { postStub } from '../post/post.mock';
 import { userStub } from '../user/user.mock';
 
-export const commentStub = (commentId: string, postId: number): Comment => {
+export const commentStub = (commentId: string, postId: number, parentCommentId?: string): Comment => {
   return {
     id: commentId,
     content: 'content',
@@ -12,7 +12,7 @@ export const commentStub = (commentId: string, postId: number): Comment => {
     post: postStub(postId, BoardId.Free),
     authorId: `author ${postId}`,
     author: userStub(`author ${postId}`),
-    parentCommentId: null,
+    parentCommentId: parentCommentId ? parentCommentId : null,
     parentComment: null,
     childComments: null,
     createdAt: new Date('2023-01-01'),

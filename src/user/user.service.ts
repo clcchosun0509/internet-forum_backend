@@ -8,6 +8,7 @@ import { DeepPartial, Repository } from 'typeorm';
 import { User } from '../entities';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import * as _ from 'lodash';
+import { generateRandomString } from '../utils';
 
 @Injectable()
 export class UserService {

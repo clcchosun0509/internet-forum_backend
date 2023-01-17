@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { createPaginationObject, paginate } from 'nestjs-typeorm-paginate';
+import { createPaginationObject } from 'nestjs-typeorm-paginate';
 import { Repository } from 'typeorm';
-import { Post, User } from '../entities';
+import { User } from '../entities';
 import { Comment } from '../entities/comment.entity';
 import { PostService } from '../post/post.service';
 import { CreateCommentDto } from './dtos/create-comment.dto';

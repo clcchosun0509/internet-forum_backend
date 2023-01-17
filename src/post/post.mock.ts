@@ -18,10 +18,10 @@ export const postLikeStub = (
   };
 };
 
-export const postStub = (postId: number, boardId: BoardId): Post => {
+export const postStub = (postId: number, boardId: BoardId, title?: string): Post => {
   return {
     id: postId,
-    title: `title ${postId}`,
+    title: title ? title : `title ${postId}`,
     authorId: `author ${postId}`,
     author: userStub(`author ${postId}`),
     content: `<p>content ${postId}</p>`,
@@ -39,9 +39,10 @@ export const postStub = (postId: number, boardId: BoardId): Post => {
 export const postsStub: (
   limit: number,
   boardId: BoardId,
-) => Pagination<Post, IPaginationMeta> = (limit, boardId) => {
+  posts?: [Post, Post]
+) => Pagination<Post, IPaginationMeta> = (limit, boardId, posts) => {
   return {
-    items: [postStub(1, boardId), postStub(2, boardId)],
+    items: posts ? posts : [postStub(1, boardId), postStub(2, boardId)],
     meta: {
       itemCount: 2,
       totalItems: 2,
