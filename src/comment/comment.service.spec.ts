@@ -16,11 +16,15 @@ describe('CommentService', () => {
   const childCommentMock = commentStub(childCommentId, postId, commentId);
   const commentsMock = commentsStub(limit, postId);
   const whereSpy = jest.fn().mockReturnThis();
+  const orderBySpy = jest.fn().mockReturnThis();
+  const withDeletedSpy = jest.fn().mockReturnThis();
   const leftJoinAndSelectSpy = jest.fn().mockReturnThis();
 
   const commentRepositoryMock = {
     createQueryBuilder: jest.fn().mockImplementation(() => ({
       where: whereSpy,
+      orderBy: orderBySpy,
+      withDeleted: withDeletedSpy,
       leftJoinAndSelect: leftJoinAndSelectSpy,
       getMany: jest.fn().mockResolvedValueOnce(commentsMock.items),
     })),
@@ -90,6 +94,8 @@ describe('CommentService', () => {
         postId: postId,
       });
       expect(whereSpy).toHaveBeenCalledTimes(1);
+      expect(orderBySpy).toHaveBeenCalledTimes(1);
+      expect(withDeletedSpy).toHaveBeenCalledTimes(1);
       expect(leftJoinAndSelectSpy).toHaveBeenCalledTimes(3);
     });
   });

@@ -1,12 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { createPaginationObject } from 'nestjs-typeorm-paginate';
-import { Repository } from 'typeorm';
+import { FindOptionsRelations, Repository } from 'typeorm';
 import { User } from '../entities';
 import { Comment } from '../entities/comment.entity';
 import { PostService } from '../post/post.service';
 import { CreateCommentDto } from './dtos/create-comment.dto';
 import { CreateReplyCommentDto } from './dtos/create-reply-comment.dto';
+import { UpdateCommentDto } from './dtos/update-comment.dto';
+import { checkIsValidAndAuthorized } from './utils/service-helper';
+import * as _ from 'lodash';
 
 @Injectable()
 export class CommentService {
@@ -22,34 +25,27 @@ export class CommentService {
       .leftJoinAndSelect('comment.author', 'author')
       .leftJoinAndSelect('comment.parentComment', 'parentComment')
       .leftJoinAndSelect('parentComment.author', 'parentCommentAuthor')
+      .orderBy('comment.created_at', 'ASC')
+      .withDeleted()
       .getMany();
-      
-    const sortedComments: Comment[] = [];
-    const orphanComments: Comment[] = [];
-    for (const comment of comments) {
-      if (!comment.parentCommentId) {
-        sortedComments.push(comment);
-        continue;
-      }
-      const parentIndex = sortedComments.findIndex(
-        (parentComment) => parentComment.id === comment.parentCommentId,
-      );
-      if (parentIndex === -1) {
-        orphanComments.push(comment);
-        continue;
-      }
-      sortedComments.splice(parentIndex + 1, 0, comment);
-    }
-    const concatedComments = [...orphanComments, ...sortedComments];
 
-    const items = concatedComments.slice((page - 1) * limit, page * limit);
-    const totalItems = concatedComments.length;
+    const sortedComments = this.sortComments(comments);
+
+    const items = sortedComments.slice((page - 1) * limit, page * limit);
+    const totalItems = sortedComments.length;
 
     return createPaginationObject({
       items,
       totalItems,
       currentPage: page,
       limit,
+    });
+  }
+
+  findOneById(id: string, relations?: FindOptionsRelations<Comment>) {
+    return this.commentRepo.findOne({
+      where: { id },
+      relations,
     });
   }
 
@@ -88,5 +84,74 @@ export class CommentService {
     });
 
     return await this.commentRepo.save(comment);
+  }
+
+  async updateComment(
+    id: string,
+    user: User,
+    updateCommentDto: UpdateCommentDto,
+  ) {
+    const foundComment = await this.findOneById(id);
+    checkIsValidAndAuthorized(foundComment, user);
+
+    return this.commentRepo.save({ ...foundComment, ...updateCommentDto });
+  }
+
+  async deleteComment(id: string, user: User) {
+    const foundComment = await this.findOneById(id);
+    checkIsValidAndAuthorized(foundComment, user);
+
+    return await this.commentRepo.softDelete({ id });
+  }
+
+  private sortComments(comments: Comment[]) {
+
+    // 기존에는 댓글과 대댓글이 따로따로 있는데,
+    // 댓글 밑에 대댓글이 오도록 순서를 바꿔준다.
+    const firstSortedComments: Comment[] = [];
+    for (const comment of comments) {
+      if (!comment.parentCommentId) {
+        firstSortedComments.push(comment);
+        continue;
+      }
+      const parentIndex = firstSortedComments.findIndex(
+        (parentComment) => parentComment.id === comment.parentCommentId,
+      );
+
+      firstSortedComments.splice(parentIndex + 1, 0, comment);
+    }
+
+    // 대댓글의 순서를 생성날짜순으로 정렬한다.
+    const replyCommentItems: Record<string, Comment[]> = {};
+    let replyCommentsPosition = -1;
+    const parentCommentItems = firstSortedComments.filter((comment) => {
+      if (!comment.parentCommentId) {
+        replyCommentsPosition++;
+        return true;
+      }
+      if (replyCommentItems[replyCommentsPosition]) {
+        replyCommentItems[replyCommentsPosition].push(comment);
+      } else {
+        replyCommentItems[replyCommentsPosition] = [comment];
+      }
+      return false;
+    });
+    const sortedReplyCommentItems = _.mapValues(
+      replyCommentItems,
+      (comments) => {
+        return comments.sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1));
+      },
+    );
+
+    // 댓글과 순서가 정렬된 대댓글을 하나로 합쳐준다.
+    const result: Comment[] = [];
+    parentCommentItems.forEach((comment, index) => {
+      result.push(comment);
+      if (sortedReplyCommentItems[index]) {
+        result.push(...sortedReplyCommentItems[index]);
+      }
+    });
+
+    return result;
   }
 }

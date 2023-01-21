@@ -2,8 +2,11 @@ import {
   Body,
   Controller,
   DefaultValuePipe,
+  Delete,
   Get,
+  Param,
   ParseIntPipe,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -15,6 +18,7 @@ import { User, UserRole } from '../entities/user.entity';
 import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dtos/create-comment.dto';
 import { CreateReplyCommentDto } from './dtos/create-reply-comment.dto';
+import { UpdateCommentDto } from './dtos/update-comment.dto';
 
 @Controller('comment')
 export class CommentController {
@@ -45,5 +49,24 @@ export class CommentController {
   ) {
     const comment = await this.commentService.createReplyComment(body, user);
     return comment;
+  }
+
+  @Patch('/:id')
+  @UseGuards(AuthGuard)
+  @Role(UserRole.USER)
+  async updateComment(
+    @Param('id') id: string,
+    @AuthUser() user: User,
+    @Body() body: UpdateCommentDto,
+  ) {
+    return await this.commentService.updateComment(id, user, body);
+  }
+
+  @Delete('/:id')
+  @UseGuards(AuthGuard)
+  @Role(UserRole.USER)
+  async deleteComment(@Param('id') id: string, @AuthUser() user: User) {
+    await this.commentService.deleteComment(id, user);
+    return { status: true };
   }
 }
