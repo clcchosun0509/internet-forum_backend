@@ -1,73 +1,46 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
+# 순수한 웃음을 만들어내는 커뮤니티 사이트 - 백엔드
+프론트엔드 : [프론트엔드 코드로 이동](https://github.com/clcchosun0509/internet-forum_frontend)
+
+[Nestjs](https://github.com/nestjs/nest)를 기반으로한 백엔드 코드입니다.
+
+[웹사이트로 이동](https://hahahaforum.com/)하여 직접 사이트를 확인할 수 있습니다.
+## 개발스택
+- Nestjs
+- Kubernetes
+- Minikube
+- Docker
+- Jenkins
+- Elastic Stack (Elasticsearch, logstash, kibana)
+- Redis session, OAuth, Passport
+- PostgreSQL
+- Jest
+
+## 아키텍처
+
+<p align="center" class="img-box">
+<img src="https://github.com/clcchosun0509/internet-forum_backend/blob/main/docs/flowchart.png" alt="flowchart" width=1000 />
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## 현재까지 구현된 기능
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
+- 네이버, 깃허브 OAuth로 회원가입/로그인 (현재 깃허브만 가입 가능)
+- 로그아웃
+- 글쓰기, 글수정, 글삭제
+- 댓글쓰기, 댓글수정, 댓글삭제
+- 대댓글쓰기, 대댓글수정, 대댓글삭제
+- 제목 + 내용, 제목, 글쓴이 검색
+- 추천하기
+- 프로필 수정 (현재는 닉네임만 수정가능)
+- 다크 모드 지원
+
+## 예제 이미지
+### 기본적인 사이트 작동 방식
+<p align="center" class="img-box">
+<img src="https://github.com/clcchosun0509/internet-forum_backend/blob/main/docs/internet-forum-example.gif" alt="internet forum app example" width=400 />
 </p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+&nbsp;
 
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Installation
-
-```bash
-$ npm install
-```
-
-## Running the app
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Test
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+### 검색 기능
+<p align="center" class="img-box">
+<img src="https://github.com/clcchosun0509/internet-forum_backend/blob/main/docs/internet-forum-example2.gif" alt="flowchart" width=1000 />
+</p>
